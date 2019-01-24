@@ -1,5 +1,9 @@
 import path from 'path';
 
+import ParamParser from '../Parser/ParamParser.js';
+import CommentParser from '../Parser/CommentParser.js';
+import ESParser from '../Parser/ESParser.js';
+
 /**
  * Plugin system for your plugin.
  */
@@ -97,6 +101,21 @@ class Plugin {
     ev.data = {parser, parserOption, filePath, code};
     this._execHandler('onHandleCodeParser', ev);
     return {parser: ev.data.parser, parserOption: ev.data.parserOption};
+  }
+
+  /**
+   * handle doc class creation.
+   * @since 1.2.0
+   * @emits {onHandleDocClass}
+   * @param {string} type - name of the class type (e.g. 'Method', 'Class', ...).
+   * @param {object} Clazz - initial class to be created to parse a document type.
+   * @returns {object} class to create a doc parser.
+   */
+  onHandleDocClass(type, Clazz) {
+    const ev = new PluginEvent();
+    ev.data = {type, Clazz, ParamParser, CommentParser, ESParser};
+    this._execHandler('onHandleDocClass', ev);
+    return ev.data.Clazz;
   }
 
   /**

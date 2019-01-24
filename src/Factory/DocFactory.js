@@ -1,4 +1,5 @@
 import logger from 'color-logger';
+import Plugin from '../Plugin/Plugin.js';
 import CommentParser from '../Parser/CommentParser.js';
 import FileDoc from '../Doc/FileDoc.js';
 import ClassDoc from '../Doc/ClassDoc.js';
@@ -13,6 +14,7 @@ import ExternalDoc from '../Doc/ExternalDoc.js';
 import ASTUtil from '../Util/ASTUtil.js';
 
 const already = Symbol('already');
+
 
 /**
  * Doc factory class.
@@ -40,6 +42,7 @@ export default class DocFactory {
     this._pathResolver = pathResolver;
     this._results = [];
     this._processedClassNodes = [];
+    this._determineDocClasses();
 
     this._inspectExportDefaultDeclaration();
     this._inspectExportNamedDeclaration();
@@ -52,6 +55,24 @@ export default class DocFactory {
     if (ast.program.body.length === 0 && ast.program.innerComments) {
       const results = this._traverseComments(ast, null, ast.program.innerComments);
       this._results.push(...results);
+    }
+  }
+
+  /**
+   * determine final doc class types using ability to be overrided by plugins.
+   * @private
+   */
+  _determineDocClasses() {
+    this._docClasses = {
+      "Class":         Plugin.onHandleDocClass("Class", ClassDoc),
+      "Method":        Plugin.onHandleDocClass("Method", MethodDoc),
+      "ClassProperty": Plugin.onHandleDocClass("ClassProperty", ClassProperty),
+      "Member":        Plugin.onHandleDocClass("Member", MemberDoc),
+      "Function":      Plugin.onHandleDocClass("Function", FunctionDoc),
+      'Variable':      Plugin.onHandleDocClass("Variable", VariableDoc),
+      'Assignment':    Plugin.onHandleDocClass("Assignment", AssignmentDoc),
+      'Typedef':       Plugin.onHandleDocClass("Typedef", TypedefDoc),
+      'External':      Plugin.onHandleDocClass("External", ExternalDoc),
     }
   }
 
@@ -378,23 +399,9 @@ export default class DocFactory {
       this._processedClassNodes.push(node);
     }
 
-    let Clazz;
-    /* eslint-disable max-statements-per-line */
-    switch (type) {
-      case 'Class': Clazz = ClassDoc; break;
-      case 'Method': Clazz = MethodDoc; break;
-      case 'ClassProperty': Clazz = ClassProperty; break;
-      case 'Member': Clazz = MemberDoc; break;
-      case 'Function': Clazz = FunctionDoc; break;
-      case 'Variable': Clazz = VariableDoc; break;
-      case 'Assignment': Clazz = AssignmentDoc; break;
-      case 'Typedef': Clazz = TypedefDoc; break;
-      case 'External': Clazz = ExternalDoc; break;
-      default:
-        throw new Error(`unexpected type: ${type}`);
-    }
-
-    if (!Clazz) return null;
+    // get doc class
+    let Clazz = this._docClasses[type];
+    if (!Clazz) throw new Error(`unexpected type: ${type}`);
     if (!node.type) node.type = type;
 
     return new Clazz(this._ast, node, this._pathResolver, tags);
