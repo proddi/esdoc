@@ -1,16 +1,16 @@
 {
-  "name": "esdoc",
+  "name": "@proddi/esdoc",
   "version": "1.2.0",
-  "description": "Good Documentation Generator For JavaScript",
+  "description": "Good Documentation Generator For JavaScript (forked from https://github.com/esdoc/esdoc)",
   "author": {
-    "name": "h13i32maru",
-    "url": "https://h13i32maru.jp"
+    "name": "proddi",
+    "url": "https://github.com/proddi/esdoc"
   },
   "homepage": "https://esdoc.org/",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/esdoc/esdoc"
+    "url": "https://github.com/proddi/esdoc"
   },
   "engines": {
     "node": ">= 6.0.0"
