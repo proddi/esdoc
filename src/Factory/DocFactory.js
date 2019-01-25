@@ -64,16 +64,16 @@ export default class DocFactory {
    */
   _determineDocClasses() {
     this._docClasses = {
-      "Class":         Plugin.onHandleDocClass("Class", ClassDoc),
-      "Method":        Plugin.onHandleDocClass("Method", MethodDoc),
-      "ClassProperty": Plugin.onHandleDocClass("ClassProperty", ClassProperty),
-      "Member":        Plugin.onHandleDocClass("Member", MemberDoc),
-      "Function":      Plugin.onHandleDocClass("Function", FunctionDoc),
-      'Variable':      Plugin.onHandleDocClass("Variable", VariableDoc),
-      'Assignment':    Plugin.onHandleDocClass("Assignment", AssignmentDoc),
-      'Typedef':       Plugin.onHandleDocClass("Typedef", TypedefDoc),
-      'External':      Plugin.onHandleDocClass("External", ExternalDoc),
-    }
+      Class: Plugin.onHandleDocClass('Class', ClassDoc),
+      Method: Plugin.onHandleDocClass('Method', MethodDoc),
+      ClassProperty: Plugin.onHandleDocClass('ClassProperty', ClassProperty),
+      Member: Plugin.onHandleDocClass('Member', MemberDoc),
+      Function: Plugin.onHandleDocClass('Function', FunctionDoc),
+      Variable: Plugin.onHandleDocClass('Variable', VariableDoc),
+      Assignment: Plugin.onHandleDocClass('Assignment', AssignmentDoc),
+      Typedef: Plugin.onHandleDocClass('Typedef', TypedefDoc),
+      External: Plugin.onHandleDocClass('External', ExternalDoc),
+    };
   }
 
   /**
@@ -400,7 +400,7 @@ export default class DocFactory {
     }
 
     // get doc class
-    let Clazz = this._docClasses[type];
+    const Clazz = this._docClasses[type];
     if (!Clazz) throw new Error(`unexpected type: ${type}`);
     if (!node.type) node.type = type;
 
@@ -420,8 +420,12 @@ export default class DocFactory {
       const tagName = tag.tagName;
       /* eslint-disable default-case */
       switch (tagName) {
-        case '@typedef': type = 'Typedef'; break;
-        case '@external': type = 'External'; break;
+        case '@typedef':
+          type = 'Typedef';
+          break;
+        case '@external':
+          type = 'External';
+          break;
       }
     }
 
