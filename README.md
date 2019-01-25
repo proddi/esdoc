@@ -1,8 +1,51 @@
-<!--![Owner Status](https://img.shields.io/badge/owner-busy-red.svg)-->
 [![Build Status](https://travis-ci.org/proddi/esdoc.svg?branch=master)](https://travis-ci.org/proddi/esdoc)
-[![Coverage Status](https://codecov.io/gh/esdoc/esdoc/branch/master/graph/badge.svg)](https://codecov.io/gh/esdoc/esdoc)
+[![Code Coverage](https://codecov.io/gh/proddi/esdoc/branch/master/graph/badge.svg)](https://codecov.io/gh/proddi/esdoc)
 
-# ESDoc
+
+# Fork information
+
+This repo is a fork of https://github.com/esdoc/esdoc.
+
+The main feature add is providing a Plugin-hook to extend/change ast-parsing for various doc types.
+
+Example:
+
+    class Plugin {
+      onHandleDocClass(ev) {
+        const {type, Clazz, ParamParser} = ev.data;
+        if (ev.data.type === 'Class') {
+          ev.data.Clazz = class extends ev.data.Clazz {
+
+            /**
+             * change the parsing of @emits from:
+             *   @emits <identifier> [description]
+             * to:
+             *   @emits <type> <name> [-] [description]
+             */
+            _$emits() {
+              const values = this._findAllTagValues(['@emits']);
+              if (!values) return;
+
+              this._value.emits = [];
+              for (const value of values) {
+                const {typeText, paramName, paramDesc} = ParamParser.parseParamValue(value);
+                const result = ParamParser.parseParam(typeText, paramName, paramDesc);
+                this._value.emits.push(result);
+              }
+            }
+
+          }
+        }
+      }
+    }
+
+
+Installation
+
+    npm install --save-dev @proddi/esdoc
+
+
+# (original) ESDoc
 
 ESDoc is a documentation generator for JavaScript.<br/>
 Please <a href="https://try.esdoc.org">try it out</a>!
